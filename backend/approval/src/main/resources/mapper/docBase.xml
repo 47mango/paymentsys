@@ -6,4 +6,8 @@
     <insert id="insertDoc">
         insert into doc_basc(doc_ttl) values ("test")
     </insert>
+
+    <select id="selectDoc">
+        select * from doc_basc
+    </select>
 </mapper>

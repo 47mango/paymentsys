@@ -7,4 +7,5 @@ import javax.print.Doc;
 @Mapper
 public interface DocMapper {
     void insertDoc();
+    void selectDoc();
 }
