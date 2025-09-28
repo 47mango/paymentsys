@@ -6,14 +6,15 @@ import java.util.List;
 
 @Getter
 @Setter
-@Data
-@NoArgsConstructor
+@ToString
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public class createDocInputDto {
-    private String user_id;
+public class retrieveDocOutputDto {
+    private int doc_no;
     private String doc_ttl;
     private String doc_text;
     private List<docLineSubDto> doc_line;
+    private String doc_user_id;
     private String crt_date;
 }
