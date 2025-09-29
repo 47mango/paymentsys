@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -13,6 +13,7 @@ import { format } from "date-fns"
 import { ko } from "date-fns/locale"
 import { Checkbox } from "@radix-ui/themes"
 import { useRouter } from "next/navigation"
+import { getDocumentList } from "@/services/api/document"
 
 // Mock data for the document list
 const mockDocuments = [
@@ -117,10 +118,18 @@ export default function DocumentListPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [pageSize, setPageSize] = useState("10")
   const [currentPage, setCurrentPage] = useState(1)
+  const [documentList, setDocumentList] = useState<any[]>([]);
 
   const router = useRouter()
 
   const totalItems = 30
+
+
+  useEffect(() => {
+    getDocumentList().then((res) => {
+      setDocumentList(res);
+    });
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 w-full">
@@ -184,22 +193,6 @@ export default function DocumentListPage() {
                   </SelectContent>
                 </Select>
               </div>
-
-              {/* Approval Status
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">결재상태</label>
-                <Select value={approvalStatus} onValueChange={setApprovalStatus}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="전체">전체</SelectItem>
-                    <SelectItem value="상신">상신</SelectItem>
-                    <SelectItem value="진행중">진행중</SelectItem>
-                    <SelectItem value="완료">완료</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div> */}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -262,7 +255,7 @@ export default function DocumentListPage() {
                 <TableRow className="bg-gray-50">
                   <TableHead className="text-center font-medium">-</TableHead>
                   <TableHead className="text-center font-medium">기안양식</TableHead>
-                  <TableHead className="text-center font-medium">기안제목</TableHead>
+                  <TableHead className="text-center font-medium">기안학과</TableHead>
                   <TableHead className="text-center font-medium">기안자</TableHead>
                   <TableHead className="text-center font-medium">상신일시</TableHead>
                   <TableHead className="text-center font-medium">결재라인</TableHead>
@@ -270,23 +263,23 @@ export default function DocumentListPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {mockDocuments.map((doc) => (
-                  <TableRow key={doc.id} className="hover:bg-gray-50">
+                {documentList.map((doc) => (
+                  <TableRow key={doc.doc_no} className="hover:bg-gray-50">
                     <TableCell className="text-center"><Checkbox id={doc.id.toString()} /></TableCell>
-                    <TableCell className="text-center">{doc.type}</TableCell>
+                    <TableCell className="text-center">{doc.user_dept}</TableCell>
                     <TableCell className="text-center">
-                      <button className="text-blue-600 hover:underline">{doc.title}</button>
+                      <button className="text-blue-600 hover:underline">{doc.doc_ttl}</button>
                     </TableCell>
-                    <TableCell className="text-center text-sm">{doc.author}</TableCell>
-                    <TableCell className="text-center text-sm">{doc.submissionDate}</TableCell>
-                    <TableCell className="text-center text-sm">{doc.approvalLine}</TableCell>
+                    <TableCell className="text-center text-sm">{doc.doc_user_id}</TableCell>
+                    <TableCell className="text-center text-sm">{doc.crt_date}</TableCell>
+                    <TableCell className="text-center text-sm">"동양미래대학교"</TableCell>
                     <TableCell className="text-center">
                       <span
                         className={`px-2 py-1 rounded text-xs font-medium ${
-                          doc.status === "진행중" ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"
+                          "진행중" === "진행중" ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"
                         }`}
                       >
-                        {doc.status}
+                        {"진행중"}
                       </span>
                     </TableCell>
                   </TableRow>
@@ -299,12 +292,6 @@ export default function DocumentListPage() {
               <div className="flex items-center gap-2">
                 <Button variant={currentPage === 1 ? "default" : "outline"} size="sm" onClick={() => setCurrentPage(1)}>
                   1
-                </Button>
-                <Button variant={currentPage === 2 ? "default" : "outline"} size="sm" onClick={() => setCurrentPage(2)}>
-                  2
-                </Button>
-                <Button variant={currentPage === 3 ? "default" : "outline"} size="sm" onClick={() => setCurrentPage(3)}>
-                  3
                 </Button>
               </div>
             </div>

@@ -13,8 +13,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PlusCircle, Trash2, Upload, User } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
+import { useSession } from "next-auth/react";
+import { createDocument, getDocumentList } from "@/services/api/document";
 
 // 결재자 타입 정의
 interface Approver {
@@ -29,6 +31,17 @@ export default function DocumentDraftForm() {
   const [approvers, setApprovers] = useState<Approver[]>([]);
   const [fileName, setFileName] = useState("");
   const [content, setContent] = useState("");
+
+  const { data: session } = useSession();
+
+  const userInfo = session?.user;
+
+  // 세션에서 사용자 정보를 가져와서 drafter state에 설정
+  useEffect(() => {
+    if (userInfo?.name) {
+      setDrafter(userInfo.name);
+    }
+  }, [userInfo?.name]);
 
   // 파일 선택 핸들러
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,13 +114,13 @@ export default function DocumentDraftForm() {
 
     console.log("제출된 데이터:", formData);
 
-    const response = await fetch("http://localhost:3000/api/draft",{
-      method : 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData),
-    })
-
-    alert("문서가 기안되었습니다.");
+    try {
+      await createDocument(formData);
+      alert("문서가 기안되었습니다.");
+    } catch (error) {
+      console.error("문서 기안 실패:", error);
+      alert("문서 기안에 실패했습니다.");
+    }
   };
 
   return (
@@ -139,6 +152,7 @@ export default function DocumentDraftForm() {
               onChange={(e) => setDrafter(e.target.value)}
               placeholder="기안자 이름을 입력하세요"
               required
+              readOnly
             /> 
           </div>
 
