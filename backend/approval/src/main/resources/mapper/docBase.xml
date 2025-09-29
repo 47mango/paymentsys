@@ -10,21 +10,26 @@
     </insert>
 
     <select id="selectAllDoc" resultType="com.example.approval.dto.retrieveAllOutputDto">
-        select doc_no
-             , doc_user_id
-             , doc_ttl
-             , crt_date
-        from doc_base
+        select a.doc_no
+             , a.doc_user_id
+             , a.doc_ttl
+             , b.user_dept
+             , a.crt_date
+        from doc_base a
+        left join user_base b
+               on a.doc_user_id = b.user_id
         where doc_user_id = #{user_id}
     </select>
 
     <select id="selectDoc" resultType="com.example.approval.dto.retrieveDocOutputDto">
-        select doc_no
-        , doc_ttl
-        , doc_text
-        , doc_user_id
-        , crt_date
-        from doc_base
+        select a.doc_no
+        , a.doc_ttl
+        , a.doc_text
+        , a.doc_user_id
+        , a.crt_date
+        , b.user_dept
+        from doc_base a
+        left join user_base b on a.doc_user_id = b.user_id
         where doc_no = #{doc_no};
     </select>
 </mapper>
