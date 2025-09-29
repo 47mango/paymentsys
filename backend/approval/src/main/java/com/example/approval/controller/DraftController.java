@@ -32,7 +32,7 @@ public class DraftController {
 
         draftService.createDoc(input);
 
-        return ResponseEntity.ok("문서 저장 성공...");
+        return ResponseEntity.ok("문서 저장 성공... 전체 조회 시작");
 
     }
 }
