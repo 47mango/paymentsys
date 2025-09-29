@@ -14,6 +14,7 @@ import { ko } from "date-fns/locale"
 import { Checkbox } from "@radix-ui/themes"
 import { useRouter } from "next/navigation"
 import { getDocumentList } from "@/services/api/document"
+import { useSession } from "next-auth/react"
 
 // Mock data for the document list
 const mockDocuments = [
@@ -119,16 +120,30 @@ export default function DocumentListPage() {
   const [pageSize, setPageSize] = useState("10")
   const [currentPage, setCurrentPage] = useState(1)
   const [documentList, setDocumentList] = useState<any[]>([]);
+  const [email, setEmail] = useState<string | null>("");
 
   const router = useRouter()
 
   const totalItems = 30
 
+  const { data: session } = useSession();
+
+  const userInfo = session?.user;
+
+  // 세션에서 사용자 정보를 가져와서 drafter state에 설정
+  useEffect(() => {
+    if (userInfo?.name) {
+      setEmail(userInfo.email ?? "");
+    }
+  }, [userInfo?.email]);
+
 
   useEffect(() => {
-    getDocumentList().then((res) => {
-      setDocumentList(res);
-    });
+    if (email) {
+    getDocumentList(email).then((res) => {
+        setDocumentList(res);
+      });
+    }
   }, []);
 
   return (
