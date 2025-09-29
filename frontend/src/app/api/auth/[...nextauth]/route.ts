@@ -1,49 +1,26 @@
-import NextAuth from 'next-auth';
-import Providers from 'next-auth/providers';
-import axios from 'axios';
+import NextAuth, { NextAuthOptions } from 'next-auth';
+import GoogleProvider from 'next-auth/providers/google';
 
-export default NextAuth({
+const authOptions: NextAuthOptions = {
+  pages: {
+    signIn: '/auth/login',
+  },
   providers: [
-    Providers.Credentials({
-      // 이 부분은 자체 로그인 로직을 구현합니다.
-      credentials: {
-        username: { label: 'Username', type: 'text' },
-        password: {  label: 'Password',  type: 'password' }
-      },
-      async authorize(credentials) {
-        // 외부 서버와 통신하여 유저 정보와 토큰을 가져오는 로직을 여기에 구현합니다.
-        const { username, password } = credentials;
-
-        // 외부 서버와의 통신을 통해 유저 정보와 토큰을 가져옵니다.
-        const response = await axios.post('로직추가', {
-          username,
-          password
-        });
-
-        const data = response.data;
-
-        if (data) {
-          // 유저 정보와 토큰을 NextAuth.js 세션에 저장합니다.
-          return {
-            name: data.name,
-            email: data.email,
-            token: data.token
-          };
-        } else {
-          // 로그인 실패 시 null을 반환합니다.
-          return null;
-        }
-      }
-    })
+    GoogleProvider({
+      clientId: process.env.GOOGLE_OAUTH_ID || '',
+      clientSecret: process.env.GOOGLE_OAUTH_SECRET || '',
+    }),
   ],
   callbacks: {
-    async session(session, token) {
-      // 세션에 토큰 정보를 추가합니다.
-      session.token = token.token;
-      return session;
-    }
+    async redirect({ url, baseUrl }) {
+      // 로그인 성공 후 홈페이지로 리다이렉트
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      else if (new URL(url).origin === baseUrl) return url;
+      return baseUrl;
+    },
   },
-  session: {
-    jwt: true
-  }
-});
+};
+
+const handler = NextAuth(authOptions);
+
+export { authOptions, handler as GET, handler as POST };

@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PlusCircle, Trash2, Upload, User } from "lucide-react";
 import { useState } from "react";
+import { Textarea } from "@/components/ui/textarea";
 
 // 결재자 타입 정의
 interface Approver {
@@ -27,6 +28,7 @@ export default function DocumentDraftForm() {
   const [file, setFile] = useState<File | null>(null);
   const [approvers, setApprovers] = useState<Approver[]>([]);
   const [fileName, setFileName] = useState("");
+  const [content, setContent] = useState("");
 
   // 파일 선택 핸들러
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -110,7 +112,8 @@ export default function DocumentDraftForm() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <Card className="w-full">
+        <div className="min-h-screen bg-gray-50 p-6 w-full">
+      <Card className="max-w-7xl mx-auto">
         <CardHeader>
           <CardTitle>문서 기안서</CardTitle>
         </CardHeader>
@@ -137,6 +140,18 @@ export default function DocumentDraftForm() {
               placeholder="기안자 이름을 입력하세요"
               required
             /> 
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="content">본문내용</Label>
+            <Textarea
+              id="content"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="본문내용을 입력하세요"
+              className="h-70"
+              required
+            />
           </div>
 
           {/* 파일 업로드 */}
@@ -246,8 +261,9 @@ export default function DocumentDraftForm() {
           <Button type="submit" className="w-full">
             문서 기안하기
           </Button>
-        </CardFooter>
-      </Card>
+          </CardFooter>
+        </Card>
+      </div>
     </form>
   );
 }
