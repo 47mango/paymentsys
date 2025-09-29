@@ -4,6 +4,27 @@
 
 <mapper namespace="com.example.approval.dao.DocMapper">
     <insert id="insertDoc">
-        insert into doc_basc(doc_ttl) values ("test")
+        insert into
+        doc_base(doc_ttl,doc_text,doc_act_yn,doc_user_id,crt_date)
+        values (#{doc_ttl},#{doc_text},"N",#{user_id},#{crt_date})
     </insert>
+
+    <select id="selectAllDoc" resultType="com.example.approval.dto.retrieveAllOutputDto">
+        select doc_no
+             , doc_user_id
+             , doc_ttl
+             , crt_date
+        from doc_base
+        where doc_user_id = #{user_id}
+    </select>
+
+    <select id="selectDoc" resultType="com.example.approval.dto.retrieveDocOutputDto">
+        select doc_no
+        , doc_ttl
+        , doc_text
+        , doc_user_id
+        , crt_date
+        from doc_base
+        where doc_no = #{doc_no};
+    </select>
 </mapper>

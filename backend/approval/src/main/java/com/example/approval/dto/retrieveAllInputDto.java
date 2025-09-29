@@ -4,11 +4,10 @@ import lombok.*;
 
 @Getter
 @Setter
-@Data
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class docLineDto {
-    private int seq;
-    private String apvr_id;
+public class retrieveAllInputDto {
+    private String user_id;
 }
