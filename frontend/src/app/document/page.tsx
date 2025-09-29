@@ -140,7 +140,7 @@ export default function DocumentListPage() {
 
   useEffect(() => {
     if (email) {
-    getDocumentList(email).then((res) => {
+    getDocumentList({user_id: email}).then((res) => {
         setDocumentList(res);
       });
     }

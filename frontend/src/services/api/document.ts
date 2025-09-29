@@ -1,8 +1,8 @@
 import { axiosInstance } from "./axios";
 
 
-export const getDocumentList = async (userInfo: any) => {
-    const response = await axiosInstance.get('/api/retrieve',userInfo);
+export const getDocumentList = async (body: any) => {
+    const response = await axiosInstance.get('/api/retrieve',body);
     return response.data;
 }
 

@@ -2,6 +2,7 @@
 import { AspectRatio, Button, Card, Grid, Heading, Link } from "@radix-ui/themes"
 import React from "react"
 import { signIn } from "next-auth/react"
+import Image from "next/image"
 
 export default function LoginPage() {
   const handleGoogleLogin = () => {
@@ -14,9 +15,16 @@ export default function LoginPage() {
         <Grid gap="4" p="4">
             <Heading align="center">
                 <AspectRatio ratio={4/1}>
-                    <img src="/image/DMULogo.jpg" alt="logo" className="w-full h-full object-contain" />
+                    <Image 
+                        src="/images/dmuLogo.jpg" 
+                        alt="logo" 
+                        width={400}
+                        height={100}
+                        className="w-full h-full object-contain" 
+                    />
                 </AspectRatio>
             </Heading>
+            <Heading align="center">구글 로그인으로 시작하세요</Heading>
             <Grid gap="2" className="justify-items-center">
                 <Button 
                   onClick={handleGoogleLogin}
@@ -25,7 +33,6 @@ export default function LoginPage() {
                 >
                   Google로 로그인
                 </Button>
-                <Link href="/auth/singUp">회원가입</Link>
             </Grid>
         </Grid>
       </Card>
