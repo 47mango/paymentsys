@@ -30,7 +30,7 @@ export default function DocumentDraftForm() {
   const [file, setFile] = useState<File | null>(null);
   const [approvers, setApprovers] = useState<Approver[]>([]);
   const [fileName, setFileName] = useState("");
-  const [content, setContent] = useState("");
+  const [docText, setDocText] = useState("");
 
   const { data: session } = useSession();
 
@@ -106,6 +106,7 @@ export default function DocumentDraftForm() {
       doc_ttl : title,
       user_id : drafter,
       doc_file : file ? file.name : null,
+      doc_text : docText,
       doc_line: approvers.map((approver, index) => ({
         seq: index + 1,
         apvr_id: approver.name,
@@ -160,8 +161,8 @@ export default function DocumentDraftForm() {
             <Label htmlFor="content">본문내용</Label>
             <Textarea
               id="content"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
+              value={docText}
+              onChange={(e) => setDocText(e.target.value)}
               placeholder="본문내용을 입력하세요"
               className="h-70"
               required
