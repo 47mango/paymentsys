@@ -20,7 +20,10 @@ export default function LoginPage() {
                         alt="logo" 
                         width={400}
                         height={100}
-                        className="w-full h-full object-contain" 
+                        className="w-full h-full object-contain pointer-events-none"
+                        priority
+                        unoptimized
+                        draggable={false}
                     />
                 </AspectRatio>
             </Heading>
