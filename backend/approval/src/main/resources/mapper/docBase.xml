@@ -5,7 +5,7 @@
 <mapper namespace="com.example.approval.dao.DocMapper">
     <insert id="insertDoc">
         insert into
-        doc_base(doc_ttl,doc_text,doc_act_yn,doc_user_id,crt_date)
+        DOC_BASE(doc_ttl,doc_text,doc_act_yn,doc_user_id,crt_date)
         values (#{doc_ttl},#{doc_text},"N",#{user_id},#{crt_date})
     </insert>
 
@@ -15,8 +15,8 @@
              , a.doc_ttl
              , b.user_dept
              , a.crt_date
-        from doc_base a
-        left join user_base b
+        from DOC_BASE a
+        left join USER_BASE b
                on a.doc_user_id = b.user_id
         where doc_user_id = #{user_id}
     </select>
@@ -28,8 +28,8 @@
         , a.doc_user_id
         , a.crt_date
         , b.user_dept
-        from doc_base a
-        left join user_base b on a.doc_user_id = b.user_id
+        from DOC_BASE a
+        left join USER_BASE b on a.doc_user_id = b.user_id
         where doc_no = #{doc_no};
     </select>
 </mapper>
