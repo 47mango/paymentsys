@@ -15,100 +15,9 @@ import { Checkbox } from "@radix-ui/themes"
 import { useRouter } from "next/navigation"
 import { getDocumentList } from "@/services/api/document"
 import { useSession } from "next-auth/react"
-
-// Mock data for the document list
-const mockDocuments = [
-  {
-    id: 1,
-    type: "업무협조",
-    title: "카카오톡 전자결재 기안",
-    author: "김카톡(kim.kw) | 카카오워크",
-    submissionDate: "2021.09.30 15:42",
-    approvalLine: "이카톡(lee.kw) | 카카오워크",
-    status: "진행중",
-  },
-  {
-    id: 2,
-    type: "업무협조",
-    title: "카카오톡 전자결재 기안",
-    author: "김카톡(kim.kw) | 카카오워크",
-    submissionDate: "2021.09.27 12:23",
-    approvalLine: "이카톡(lee.kw) | 카카오워크",
-    status: "상신",
-  },
-  {
-    id: 3,
-    type: "업무협조",
-    title: "카카오톡 전자결재 기안",
-    author: "김카톡(kim.kw) | 카카오워크",
-    submissionDate: "2021.09.14 14:30",
-    approvalLine: "이카톡(lee.kw) | 카카오워크",
-    status: "상신",
-  },
-  {
-    id: 4,
-    type: "업무협조",
-    title: "카카오톡 전자결재 기안",
-    author: "김카톡(kim.kw) | 카카오워크",
-    submissionDate: "2021.08.26 18:21",
-    approvalLine: "이카톡(lee.kw) | 카카오워크",
-    status: "상신",
-  },
-  {
-    id: 5,
-    type: "업무기안",
-    title: "카카오톡 전자결재 기안",
-    author: "김카톡(kim.kw) | 카카오워크",
-    submissionDate: "2021.08.26 14:36",
-    approvalLine: "이카톡(lee.kw) | 카카오워크",
-    status: "진행중",
-  },
-  {
-    id: 6,
-    type: "업무기안",
-    title: "카카오톡 전자결재 기안",
-    author: "김카톡(kim.kw) | 카카오워크",
-    submissionDate: "2021.08.26 14:33",
-    approvalLine: "이카톡(lee.kw) | 카카오워크",
-    status: "상신",
-  },
-  {
-    id: 7,
-    type: "업무기안",
-    title: "카카오톡 전자결재 기안",
-    author: "김카톡(kim.kw) | 카카오워크",
-    submissionDate: "2021.08.26 14:26",
-    approvalLine: "이카톡(lee.kw) | 카카오워크",
-    status: "진행중",
-  },
-  {
-    id: 8,
-    type: "업무기안",
-    title: "카카오톡 전자결재 기안",
-    author: "김카톡(kim.kw) | 카카오워크",
-    submissionDate: "2021.08.19 10:05",
-    approvalLine: "이카톡(lee.kw) | 카카오워크",
-    status: "상신",
-  },
-  {
-    id: 9,
-    type: "업무기안",
-    title: "카카오톡 전자결재 기안",
-    author: "김카톡(kim.kw) | 카카오워크",
-    submissionDate: "2021.08.13 17:04",
-    approvalLine: "이카톡(lee.kw) | 카카오워크",
-    status: "상신",
-  },
-  {
-    id: 10,
-    type: "업무기안",
-    title: "카카오톡 전자결재 기안",
-    author: "김카톡(kim.kw) | 카카오워크",
-    submissionDate: "2021.08.13 16:54",
-    approvalLine: "이카톡(lee.kw) | 카카오워크",
-    status: "상신",
-  },
-]
+import { useDocList, DocListItem } from "@/hooks/document"
+import { formatYmd } from "@/lib/utils"
+import Link from "next/link"
 
 export default function DocumentListPage() {
   const [startDate, setStartDate] = useState<Date>()
@@ -120,7 +29,8 @@ export default function DocumentListPage() {
   const [pageSize, setPageSize] = useState("10")
   const [currentPage, setCurrentPage] = useState(1)
   const [documentList, setDocumentList] = useState<any[]>([]);
-  const [email, setEmail] = useState<string | null>("");
+  const [email, setEmail] = useState<string>("");
+  const [name, setName] = useState<string>("");
 
   const router = useRouter()
 
@@ -132,19 +42,23 @@ export default function DocumentListPage() {
 
   // 세션에서 사용자 정보를 가져와서 drafter state에 설정
   useEffect(() => {
-    if (userInfo?.name) {
+    if (userInfo) {
       setEmail(userInfo.email ?? "");
+      setName(userInfo.name ?? "");
     }
-  }, [userInfo?.email]);
-
+  }, [userInfo]);
 
   useEffect(() => {
-    if (email) {
-    getDocumentList({user_id: email}).then((res) => {
+    if (name) {
+    getDocumentList({user_id: name}).then((res) => {
         setDocumentList(res);
       });
     }
   }, []);
+  
+  const { data: docList } = useDocList(email);
+
+  console.log("docList",docList)
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 w-full">
@@ -278,15 +192,15 @@ export default function DocumentListPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {documentList.map((doc) => (
+                {docList?.map((doc: DocListItem) => (
                   <TableRow key={doc.doc_no} className="hover:bg-gray-50">
-                    <TableCell className="text-center"><Checkbox id={doc.id.toString()} /></TableCell>
+                    <TableCell className="text-center"><Checkbox id={doc.doc_no} /></TableCell>
                     <TableCell className="text-center">{doc.user_dept}</TableCell>
                     <TableCell className="text-center">
-                      <button className="text-blue-600 hover:underline">{doc.doc_ttl}</button>
+                      <Link className="text-blue-600 hover:underline" href={`/document/${doc.doc_no}`}>{doc.doc_ttl}</Link>
                     </TableCell>
                     <TableCell className="text-center text-sm">{doc.doc_user_id}</TableCell>
-                    <TableCell className="text-center text-sm">{doc.crt_date}</TableCell>
+                    <TableCell className="text-center text-sm">{formatYmd(doc.crt_date)}</TableCell>
                     <TableCell className="text-center text-sm">"동양미래대학교"</TableCell>
                     <TableCell className="text-center">
                       <span
@@ -316,3 +230,7 @@ export default function DocumentListPage() {
     </div>
   )
 }
+function useQuery(arg0: { queryKey: string[]; queryFn: (body: any) => Promise<any> }) {
+  throw new Error("Function not implemented.")
+}
+

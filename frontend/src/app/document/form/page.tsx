@@ -16,7 +16,8 @@ import { PlusCircle, Trash2, Upload, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "next-auth/react";
-import { createDocument, getDocumentList } from "@/services/api/document";
+import { useFormDocument } from "@/hooks/document";
+import { useRouter } from "next/navigation";
 
 // 결재자 타입 정의
 interface Approver {
@@ -31,10 +32,14 @@ export default function DocumentDraftForm() {
   const [approvers, setApprovers] = useState<Approver[]>([]);
   const [fileName, setFileName] = useState("");
   const [docText, setDocText] = useState("");
+  const [email, setEmail] = useState("");
 
   const { data: session } = useSession();
-
+  const router = useRouter();
   const userInfo = session?.user;
+
+  // React Query mutation 훅은 컴포넌트 최상위에서 선언해야 합니다.
+  const createDocMutation = useFormDocument();
 
   // 세션에서 사용자 정보를 가져와서 drafter state에 설정
   useEffect(() => {
@@ -42,6 +47,13 @@ export default function DocumentDraftForm() {
       setDrafter(userInfo.name);
     }
   }, [userInfo?.name]);
+
+  // 세션에서 사용자 정보를 가져와서 drafter state에 설정
+  useEffect(() => {
+    if (userInfo?.email) {
+      setEmail(userInfo.email);
+    }
+  }, [userInfo?.email]);
 
   // 파일 선택 핸들러
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -104,7 +116,7 @@ export default function DocumentDraftForm() {
     // 폼 데이터 구성
     const formData = {
       doc_ttl : title,
-      user_id : drafter,
+      user_id : email,
       doc_file : file ? file.name : null,
       doc_text : docText,
       doc_line: approvers.map((approver, index) => ({
@@ -116,8 +128,11 @@ export default function DocumentDraftForm() {
     console.log("제출된 데이터:", formData);
 
     try {
-      await createDocument(formData);
+      //await createDocument(formData);
+      console.log("createDocMutation",createDocMutation);
+      await createDocMutation.mutateAsync(formData);
       alert("문서가 기안되었습니다.");
+      router.push("/document");
     } catch (error) {
       console.error("문서 기안 실패:", error);
       alert("문서 기안에 실패했습니다.");

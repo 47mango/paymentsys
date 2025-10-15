@@ -5,6 +5,7 @@ import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
 import AuthContext from "@/context/AuthContext"
 import ConditionalLayout from "@/components/ConditionalLayout"
+import ReactQueryProvider from "@/components/ReactQueryProvider"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,9 +33,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthContext>
-          <ConditionalLayout>
-            <Theme>{children}</Theme>
-          </ConditionalLayout>
+          <ReactQueryProvider>
+            <ConditionalLayout>
+              <Theme>{children}</Theme>
+            </ConditionalLayout>
+          </ReactQueryProvider>
         </AuthContext>
       </body>
     </html>

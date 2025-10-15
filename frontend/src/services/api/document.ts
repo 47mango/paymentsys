@@ -2,12 +2,12 @@ import { axiosInstance } from "./axios";
 
 
 export const getDocumentList = async (body: any) => {
-    const response = await axiosInstance.get('/api/retrieve',body);
+    const response = await axiosInstance.post('/api/retrieve',body);
     return response.data;
 }
 
-export const getDocumentDetail = async (id: string) => {
-    const response = await axiosInstance.get(`/api/retrieve/doc_no=${id}`);
+export const getDocumentDetail = async (body: any) => {
+    const response = await axiosInstance.post(`/api/retrieve/doc`,body);
     return response.data;
 }
 
