@@ -1,22 +1,26 @@
 package com.example.approval.service;
 
 import com.example.approval.dao.UserMapper;
-import com.example.approval.dto.createDocInputDto;
-import com.example.approval.dto.joinInputDto;
-import com.example.approval.dto.loginInputDto;
-import com.example.approval.dto.loginOutputDto;
+import com.example.approval.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
 public class UserService {
 
     private final UserMapper userMapper;
+
+    public List<retrieveAllUserOutputDto> retrieveAllUser(){
+        List<retrieveAllUserOutputDto> result = userMapper.retrieveAll();
+        System.out.println("result>>>"+result);
+        return result;
+    }
 
     public loginOutputDto loginUser(loginInputDto input){
         loginOutputDto result = new loginOutputDto();
