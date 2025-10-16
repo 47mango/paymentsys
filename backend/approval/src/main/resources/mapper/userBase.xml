@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.approval.dao.UserMapper">
+    <select id="login" resultType="com.example.approval.dto.loginOutputDto">
+        SELECT
+        CASE WHEN EXISTS (
+            SELECT 1
+            FROM USER_BASE
+            WHERE USER_ID = #{user_id}
+        ) THEN 'Y'
+        ELSE 'N'          END as user_yn
+        FROM DUAL;
+    </select>
+    <insert id="join">
+        INSERT INTO USER_BASE(USER_ID,USER_NAME,CRT_DATE)
+        VALUES(#{user_id},#{user_name},#{crt_date});
+
+    </insert>
+    
+</mapper>
