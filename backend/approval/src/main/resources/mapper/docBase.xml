@@ -15,6 +15,8 @@
              , a.doc_ttl
              , b.user_dept
              , a.crt_date
+             , a.doc_ctgr1
+             , a.doc_ctgr2
         from DOC_BASE a
         left join USER_BASE b
                on a.doc_user_id = b.user_id
@@ -28,6 +30,8 @@
         , a.doc_user_id
         , a.crt_date
         , b.user_dept
+        , a.doc_ctgr1
+        , a.doc_ctgr2
         from DOC_BASE a
         left join USER_BASE b on a.doc_user_id = b.user_id
         where doc_no = #{doc_no};
