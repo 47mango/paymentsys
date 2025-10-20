@@ -13,7 +13,7 @@ app = FastAPI()
 # 형태소 분석기
 okt = Okt()
 
-# 요청 바디 모델 정의 (top_n 제거)
+# 요청 바디 모델 정의
 class TextRequest(BaseModel):
     text: str
 
@@ -24,19 +24,22 @@ def extract_keywords(request: TextRequest):
     # 1️⃣ 형태소 분석으로 명사 추출
     nouns = okt.nouns(text)
 
-    # 2️⃣ 후보 단어가 없으면 그대로 반환
+    # 2️⃣ 후보 단어가 없으면 빈 값 반환
     if not nouns:
-        return {"text": text, "keywords": []}
+        return {"text": text, "keyword1": None, "keyword2": None}
 
-    # 3️⃣ KeyBERT로 명사 후보에서 키워드 추출 (항상 top 2)
+    # 3️⃣ KeyBERT로 명사 후보에서 키워드 추출 (top 2)
     keywords = kw_model.extract_keywords(
         text,
         candidates=nouns,
         top_n=2
     )
 
-    # 4️⃣ 결과 반환
+    keyword1 = keywords[0][0] if len(keywords) > 0 else None
+    keyword2 = keywords[1][0] if len(keywords) > 1 else None
+
     return {
         "text": text,
-        "keywords": [{"word": k[0], "score": round(float(k[1]), 4)} for k in keywords]
+        "keyword1": keyword1,
+        "keyword2": keyword2
     }
