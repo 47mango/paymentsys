@@ -4,6 +4,7 @@ import com.example.approval.dto.*;
 import com.example.approval.service.CategoryService;
 import com.example.approval.service.DocService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,8 +39,13 @@ public class DocController {
         input.setDoc_ctgr2(bizOutput1.getKeyword2());
 
         int bizOutput2 = docService.createDoc(input);
-
-        return ResponseEntity.ok(bizOutput2);
+        if(bizOutput2==1){
+            return ResponseEntity.ok("성공");
+        }else{
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("문서 저장 실패");
+        }
 
     }
 
