@@ -16,6 +16,7 @@ public class UserService {
 
     private final UserMapper userMapper;
 
+
     public List<retrieveAllUserOutputDto> retrieveAllUser(){
         List<retrieveAllUserOutputDto> result = userMapper.retrieveAll();
         System.out.println("result>>>"+result);

@@ -8,7 +8,7 @@ import java.util.List;
 
 @Mapper
 public interface DocMapper {
-    void insertDoc(createDocInputDto input);
+    int insertDoc(createDocInputDto input);
     List<retrieveAllOutputDto> selectAllDoc(retrieveAllInputDto input);
     retrieveDocOutputDto selectDoc(retrieveDocInputDto input);
 }
