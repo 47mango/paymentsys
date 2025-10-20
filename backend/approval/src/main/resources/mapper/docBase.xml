@@ -5,8 +5,8 @@
 <mapper namespace="com.example.approval.dao.DocMapper">
     <insert id="insertDoc">
         insert into
-        DOC_BASE(doc_ttl,doc_text,doc_act_yn,doc_user_id,crt_date)
-        values (#{doc_ttl},#{doc_text},"N",#{user_id},#{crt_date})
+        DOC_BASE(doc_ttl,doc_text,doc_act_yn,doc_user_id,crt_date,doc_ctgr1, doc_ctgr2)
+        values (#{doc_ttl},#{doc_text},"N",#{user_id},#{crt_date},#{doc_ctgr1},#{doc_ctgr2})
     </insert>
 
     <select id="selectAllDoc" resultType="com.example.approval.dto.retrieveAllOutputDto">

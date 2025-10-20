@@ -31,13 +31,13 @@ public class DocController {
         System.out.println("docLineSub Seq>>> " + input.getDoc_line().get(0).getSeq());
         System.out.println("docLineSub ApvrId>>> " + input.getDoc_line().get(0).getApvr_id());
 
-        int bizOutput1 = docService.createDoc(input);
-        createCategoryOutputDto bizOutput2;
-        if(bizOutput1 !=0){
-            bizOutput2 = categoryService.extractKeywords(input.getDoc_ttl());
-        }else{
-            return ResponseEntity.ok("문서 저장 실패");
-        }
+        createCategoryOutputDto bizOutput1 = categoryService.extractKeywords(input.getDoc_ttl());
+        System.out.println("categoryDto>>>"+bizOutput1);
+
+        input.setDoc_ctgr1(bizOutput1.getKeyword1());
+        input.setDoc_ctgr2(bizOutput1.getKeyword2());
+
+        int bizOutput2 = docService.createDoc(input);
 
         return ResponseEntity.ok(bizOutput2);
 
