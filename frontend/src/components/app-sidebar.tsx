@@ -53,25 +53,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { signOut, useSession } from "next-auth/react"
-
-const mainItems = [
-  {
-    title: "홈",
-    url: "/",
-    icon: Home,
-  },
-  {
-    title: "문서",
-    url: "/document",
-    icon: FileText,
-    badge: 5,
-  },
-  {
-    title: "캘린더",
-    url: "/calendar",
-    icon: Calendar,
-  },
-]
+import { useDocList } from "@/hooks/document"
 
 const projectItems = [
   {
@@ -95,12 +77,6 @@ const projectItems = [
   },
 ]
 
-const recentItems = [
-  { title: "디자인 시스템", url: "/recent/design-system", icon: Star },
-  { title: "API 문서", url: "/recent/api-docs", icon: Clock },
-  { title: "사용자 피드백", url: "/recent/feedback", icon: Clock },
-]
-
 export function AppSidebar() {
   const [searchQuery, setSearchQuery] = useState("")
   const [isDarkMode, setIsDarkMode] = useState(false)
@@ -113,6 +89,31 @@ export function AppSidebar() {
     setIsDarkMode(!isDarkMode)
     document.documentElement.classList.toggle("dark")
   }
+
+  const email = userInfo?.email ?? "";
+
+  const { data: docList } = useDocList(email);
+
+  const documentLe = docList?.length;
+
+  const mainItems = [
+    {
+      title: "홈",
+      url: "/",
+      icon: Home,
+    },
+    {
+      title: "문서",
+      url: "/document",
+      icon: FileText,
+      badge: documentLe,
+    },
+    {
+      title: "캘린더",
+      url: "/calendar",
+      icon: Calendar,
+    },
+  ]
 
   return (
     <Sidebar className="border-r">
@@ -245,24 +246,6 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-
-        <SidebarGroup>
-          <SidebarGroupLabel>최근 항목</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {recentItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon className="mr-2 h-4 w-4" />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
       </SidebarContent>
 
       <SidebarFooter className="border-t p-2">
@@ -273,7 +256,7 @@ export function AppSidebar() {
               <span>{isDarkMode ? "라이트 모드" : "다크 모드"}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
-          <SidebarMenuItem>
+          {/* <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <a href="/notifications" className="flex items-center justify-between">
                 <div className="flex items-center">
@@ -285,7 +268,7 @@ export function AppSidebar() {
                 </Badge>
               </a>
             </SidebarMenuButton>
-          </SidebarMenuItem>
+          </SidebarMenuItem> */}
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <a href="/help">

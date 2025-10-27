@@ -13,11 +13,11 @@ import { format } from "date-fns"
 import { ko } from "date-fns/locale"
 import { Checkbox } from "@radix-ui/themes"
 import { useRouter } from "next/navigation"
-import { getDocumentList } from "@/services/api/document"
 import { useSession } from "next-auth/react"
 import { useDocList, DocListItem } from "@/hooks/document"
 import { formatYmd } from "@/lib/utils"
 import Link from "next/link"
+import { useUser } from "@/hooks/user"
 
 export default function DocumentListPage() {
   const [startDate, setStartDate] = useState<Date>()
@@ -28,37 +28,31 @@ export default function DocumentListPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [pageSize, setPageSize] = useState("10")
   const [currentPage, setCurrentPage] = useState(1)
-  const [documentList, setDocumentList] = useState<any[]>([]);
-  const [email, setEmail] = useState<string>("");
-  const [name, setName] = useState<string>("");
-
   const router = useRouter()
+  
+  const applyUser = useUser();
 
   const totalItems = 30
 
   const { data: session } = useSession();
 
   const userInfo = session?.user;
-
-  // 세션에서 사용자 정보를 가져와서 drafter state에 설정
-  useEffect(() => {
-    if (userInfo) {
-      setEmail(userInfo.email ?? "");
-      setName(userInfo.name ?? "");
-    }
-  }, [userInfo]);
+  const name = userInfo?.name ?? "";
+  const email = userInfo?.email ?? "";
 
   useEffect(() => {
-    if (name) {
-    getDocumentList({user_id: name}).then((res) => {
-        setDocumentList(res);
+    if (session && session.user?.email) {
+      console.log("일단 세션 있음");
+      applyUser.mutate({
+        user_id: session.user?.name ?? '',
+        user_email: session.user?.email ?? '',
       });
     }
-  }, []);
-  
+  }, [session]);
+
   const { data: docList } = useDocList(email);
 
-  console.log("docList",docList)
+  console.log(docList);
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 w-full">
@@ -186,6 +180,7 @@ export default function DocumentListPage() {
                   <TableHead className="text-center font-medium">기안양식</TableHead>
                   <TableHead className="text-center font-medium">기안학과</TableHead>
                   <TableHead className="text-center font-medium">기안자</TableHead>
+                  <TableHead className="text-center font-medium">유형</TableHead>
                   <TableHead className="text-center font-medium">상신일시</TableHead>
                   <TableHead className="text-center font-medium">결재라인</TableHead>
                   <TableHead className="text-center font-medium">결재상태</TableHead>
@@ -200,8 +195,9 @@ export default function DocumentListPage() {
                       <Link className="text-blue-600 hover:underline" href={`/document/${doc.doc_no}`}>{doc.doc_ttl}</Link>
                     </TableCell>
                     <TableCell className="text-center text-sm">{doc.doc_user_id}</TableCell>
+                    <TableCell className="text-center text-sm">{doc.doc_ctgr1}</TableCell>
                     <TableCell className="text-center text-sm">{formatYmd(doc.crt_date)}</TableCell>
-                    <TableCell className="text-center text-sm">"동양미래대학교"</TableCell>
+                    <TableCell className="text-center text-sm">동양미래대학교</TableCell>
                     <TableCell className="text-center">
                       <span
                         className={`px-2 py-1 rounded text-xs font-medium ${
@@ -229,8 +225,5 @@ export default function DocumentListPage() {
       </div>
     </div>
   )
-}
-function useQuery(arg0: { queryKey: string[]; queryFn: (body: any) => Promise<any> }) {
-  throw new Error("Function not implemented.")
 }
 

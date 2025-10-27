@@ -18,6 +18,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "next-auth/react";
 import { useFormDocument } from "@/hooks/document";
 import { useRouter } from "next/navigation";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useUserList } from "@/hooks/user";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Checkbox } from "@/components/ui/checkbox";
 
 // 결재자 타입 정의
 interface Approver {
@@ -33,6 +37,7 @@ export default function DocumentDraftForm() {
   const [fileName, setFileName] = useState("");
   const [docText, setDocText] = useState("");
   const [email, setEmail] = useState("");
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
 
   const { data: session } = useSession();
   const router = useRouter();
@@ -40,6 +45,7 @@ export default function DocumentDraftForm() {
 
   // React Query mutation 훅은 컴포넌트 최상위에서 선언해야 합니다.
   const createDocMutation = useFormDocument();
+  const {data : userList} = useUserList();
 
   // 세션에서 사용자 정보를 가져와서 drafter state에 설정
   useEffect(() => {
@@ -109,6 +115,37 @@ export default function DocumentDraftForm() {
     setApprovers(newApprovers);
   };
 
+  // 사용자 선택 토글
+  const toggleUserSelection = (userId: string) => {
+    setSelectedUsers(prev => 
+      prev.includes(userId) 
+        ? prev.filter(id => id !== userId)
+        : [...prev, userId]
+    );
+  };
+
+  // 선택된 사용자들을 결재자에 추가
+  const addSelectedUsersToApprovers = () => {
+    if (!userList || selectedUsers.length === 0) return;
+    
+    const newApprovers = selectedUsers.map(userId => {
+      const user = userList.find((u: any) => u.user_id === userId);
+      return {
+        id: userId,
+        name: user?.user_name || '',
+      };
+    });
+    
+    // 중복 제거 (이미 결재자 목록에 있는 사용자는 제외)
+    const existingApproverIds = approvers.map(a => a.id);
+    const uniqueNewApprovers = newApprovers.filter(approver => 
+      !existingApproverIds.includes(approver.id)
+    );
+    
+    setApprovers([...approvers, ...uniqueNewApprovers]);
+    setSelectedUsers([]); // 선택 상태 초기화
+  };
+
   // 폼 제출
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,12 +162,13 @@ export default function DocumentDraftForm() {
       })),
     };
 
-    console.log("제출된 데이터:", formData);
+    console.log(formData)
 
     try {
       //await createDocument(formData);
       console.log("createDocMutation",createDocMutation);
-      await createDocMutation.mutateAsync(formData);
+      const response = await createDocMutation.mutateAsync(formData);
+      console.log(response)
       alert("문서가 기안되었습니다.");
       router.push("/document");
     } catch (error) {
@@ -213,16 +251,62 @@ export default function DocumentDraftForm() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <Label>결재선</Label>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={addApprover}
-                className="flex items-center gap-1"
-              >
-                <PlusCircle size={16} />
-                결재자 추가
-              </Button>
+                  <Dialog>
+                    <DialogTrigger>
+                      <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center gap-1"
+                      >
+                      <PlusCircle size={16} />
+                        결재자 추가
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>결제자 추가</DialogTitle>
+                        <DialogDescription>
+                          <Card className="mt-4">
+                            <CardContent>
+                              <Table>
+                                <TableHeader>
+                                  <TableHead className="text-center font-medium">-</TableHead>
+                                  <TableHead className="text-center font-medium">이름</TableHead>
+                                  <TableHead className="text-center font-medium">소속과</TableHead>
+                                  <TableHead className="text-center font-medium">소속</TableHead>
+                                </TableHeader>
+                                <TableBody>
+                                  {userList?.map((item:any,idx : any) => (
+                                    <TableRow key={item.user_id} className="hover:bg-gray-50">
+                                    <TableCell className="text-center">
+                                      <Checkbox 
+                                        id={item.user_id}
+                                        checked={selectedUsers.includes(item.user_id)}
+                                        onCheckedChange={() => toggleUserSelection(item.user_id)}
+                                      />
+                                    </TableCell>
+                                    <TableCell className="text-center text-sm">{item.user_name}</TableCell>
+                                    <TableCell className="text-center text-sm">컴퓨터공학부</TableCell>
+                                    <TableCell className="text-center text-sm">동양미래대학교</TableCell>
+                                  </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </CardContent>
+                            <CardFooter className="gap-4 self-end">
+                              <DialogClose asChild>
+                                <Button variant="outline">취소</Button>
+                              </DialogClose>
+                              <DialogClose asChild>
+                                <Button onClick={addSelectedUsersToApprovers}>확인</Button>
+                              </DialogClose>
+                            </CardFooter>
+                          </Card>
+                        </DialogDescription>
+                      </DialogHeader>
+                    </DialogContent>
+                  </Dialog>
             </div>
 
             {approvers.length === 0 ? (
