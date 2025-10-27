@@ -16,4 +16,6 @@ public class retrieveAllOutputDto {
     private String doc_ttl;
     private String user_dept;
     private String crt_date;
+    private String doc_ctgr1;
+    private String doc_ctgr2;
 }

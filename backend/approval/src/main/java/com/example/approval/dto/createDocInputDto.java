@@ -18,4 +18,6 @@ public class createDocInputDto {
     private List<docLineSubDto> doc_line;
 
     private String crt_date;
+    private String doc_ctgr1;
+    private String doc_ctgr2;
 }
