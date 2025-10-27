@@ -1,12 +1,12 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { CalendarIcon, RefreshCw } from "lucide-react"
+import { CalendarIcon, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
 import { format } from "date-fns"
@@ -32,8 +32,6 @@ export default function DocumentListPage() {
   
   const applyUser = useUser();
 
-  const totalItems = 30
-
   const { data: session } = useSession();
 
   const userInfo = session?.user;
@@ -52,7 +50,48 @@ export default function DocumentListPage() {
 
   const { data: docList } = useDocList(email);
 
-  console.log(docList);
+  // 페이징 로직
+  const totalItems = docList?.length || 0;
+  const itemsPerPage = parseInt(pageSize);
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  
+  // 현재 페이지에 표시할 데이터 계산
+  const paginatedData = useMemo(() => {
+    if (!docList) return [];
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return docList.slice(startIndex, endIndex);
+  }, [docList, currentPage, itemsPerPage]);
+
+  // 페이지 사이즈 변경 시 첫 페이지로 이동
+  const handlePageSizeChange = (newPageSize: string) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1);
+  };
+
+  // 페이지 변경 함수
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  // 페이지 번호 배열 생성
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    return pages;
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 w-full">
@@ -154,11 +193,11 @@ export default function DocumentListPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600">총</span>
-                <span className="text-sm font-medium">{totalItems}건</span>
+                <span className="text-sm font-medium">{docList?.length}건</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600">페이지 사이즈</span>
-                <Select value={pageSize} onValueChange={setPageSize}>
+                <Select value={pageSize} onValueChange={handlePageSizeChange}>
                   <SelectTrigger className="w-20">
                     <SelectValue />
                   </SelectTrigger>
@@ -187,7 +226,7 @@ export default function DocumentListPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {docList?.map((doc: DocListItem) => (
+                {paginatedData?.map((doc: DocListItem) => (
                   <TableRow key={doc.doc_no} className="hover:bg-gray-50">
                     <TableCell className="text-center"><Checkbox id={doc.doc_no} /></TableCell>
                     <TableCell className="text-center">{doc.user_dept}</TableCell>
@@ -213,10 +252,52 @@ export default function DocumentListPage() {
             </Table>
 
             {/* Pagination */}
-            <div className="flex justify-center py-4 border-t">
+            <div className="flex items-center justify-between py-4 px-6 border-t bg-gray-50">
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <span>
+                  {totalItems > 0 ? `${(currentPage - 1) * itemsPerPage + 1}-${Math.min(currentPage * itemsPerPage, totalItems)}` : '0-0'} 
+                  / {totalItems}건
+                </span>
+              </div>
+              
               <div className="flex items-center gap-2">
-                <Button variant={currentPage === 1 ? "default" : "outline"} size="sm" onClick={() => setCurrentPage(1)}>
-                  1
+                {/* 이전 페이지 버튼 */}
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => goToPage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="flex items-center gap-1"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  이전
+                </Button>
+                
+                {/* 페이지 번호들 */}
+                <div className="flex items-center gap-1">
+                  {getPageNumbers().map((pageNum) => (
+                    <Button
+                      key={pageNum}
+                      variant={currentPage === pageNum ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => goToPage(pageNum)}
+                      className="w-8 h-8 p-0"
+                    >
+                      {pageNum}
+                    </Button>
+                  ))}
+                </div>
+                
+                {/* 다음 페이지 버튼 */}
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => goToPage(currentPage + 1)}
+                  disabled={currentPage === totalPages || totalPages === 0}
+                  className="flex items-center gap-1"
+                >
+                  다음
+                  <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
             </div>

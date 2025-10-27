@@ -162,13 +162,9 @@ export default function DocumentDraftForm() {
       })),
     };
 
-    console.log(formData)
-
     try {
-      //await createDocument(formData);
       console.log("createDocMutation",createDocMutation);
-      const response = await createDocMutation.mutateAsync(formData);
-      console.log(response)
+      await createDocMutation.mutateAsync(formData);
       alert("문서가 기안되었습니다.");
       router.push("/document");
     } catch (error) {
