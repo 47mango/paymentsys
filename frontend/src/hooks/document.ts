@@ -8,6 +8,7 @@ export interface DocListItem {
   doc_user_id: string
   crt_date: string | number
   doc_ctgr1: string
+  doc_ctgr2: string
 }
 
 export const useFormDocument = () => {

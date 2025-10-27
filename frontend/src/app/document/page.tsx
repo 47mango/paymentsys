@@ -50,6 +50,8 @@ export default function DocumentListPage() {
 
   const { data: docList } = useDocList(email);
 
+  console.log(docList)
+
   // 페이징 로직
   const totalItems = docList?.length || 0;
   const itemsPerPage = parseInt(pageSize);
@@ -145,7 +147,7 @@ export default function DocumentListPage() {
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">기안양식</label>
                 <Select value={documentType} onValueChange={setDocumentType}>
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -157,12 +159,24 @@ export default function DocumentListPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-4 gap-4">
               {/* Search Type */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">유형</label>
+                <Select value={searchType} onValueChange={setSearchType}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="강의">강의</SelectItem>
+                    <SelectItem value="크리넥스">크리넥스</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">검색어</label>
                 <Select value={searchType} onValueChange={setSearchType}>
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -174,7 +188,7 @@ export default function DocumentListPage() {
 
               {/* Search Input */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">제목 입력</label>
+                <label className="text-sm w-full font-medium text-gray-700">제목 입력</label>
                 <Input placeholder="제목 입력" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
               </div>
 
@@ -234,7 +248,9 @@ export default function DocumentListPage() {
                       <Link className="text-blue-600 hover:underline" href={`/document/${doc.doc_no}`}>{doc.doc_ttl}</Link>
                     </TableCell>
                     <TableCell className="text-center text-sm">{doc.doc_user_id}</TableCell>
-                    <TableCell className="text-center text-sm">{doc.doc_ctgr1}</TableCell>
+                    <TableCell className="text-center text-sm">
+                      {doc.doc_ctgr2 ? `${doc.doc_ctgr1}, ${doc.doc_ctgr2}` : doc.doc_ctgr1}
+                    </TableCell>
                     <TableCell className="text-center text-sm">{formatYmd(doc.crt_date)}</TableCell>
                     <TableCell className="text-center text-sm">동양미래대학교</TableCell>
                     <TableCell className="text-center">
