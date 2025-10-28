@@ -1,4 +1,4 @@
-import { createDocument, getDocumentDetail, getDocumentList } from "@/services/api/document";
+import { createDocument, getCategory, getDocumentDetail, getDocumentList } from "@/services/api/document";
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 export interface DocListItem {
@@ -31,4 +31,12 @@ export const useDetailDoc = (docNo : Number) => {
         queryKey:['DetailDoc'],
         queryFn: () => getDocumentDetail({ doc_no : docNo })
     })
+}
+
+export const useCarList = (user_id : string) => {
+  return useQuery({
+    queryKey: ['category', user_id],
+    queryFn: () => getCategory({ user_id }),
+    enabled: !!user_id,
+  })
 }

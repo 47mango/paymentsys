@@ -14,7 +14,7 @@ import { ko } from "date-fns/locale"
 import { Checkbox } from "@radix-ui/themes"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
-import { useDocList, DocListItem } from "@/hooks/document"
+import { useDocList, DocListItem, useCarList } from "@/hooks/document"
 import { formatYmd } from "@/lib/utils"
 import Link from "next/link"
 import { useUser } from "@/hooks/user"
@@ -42,15 +42,14 @@ export default function DocumentListPage() {
     if (session && session.user?.email) {
       console.log("일단 세션 있음");
       applyUser.mutate({
-        user_id: session.user?.name ?? '',
-        user_email: session.user?.email ?? '',
+        user_name: session.user?.name ?? '',
+        user_id: session.user?.email ?? '',
       });
     }
   }, [session]);
 
-  const { data: docList } = useDocList(email);
-
-  console.log(docList)
+  const { data : docList } = useDocList(email);
+  const { data : caList } = useCarList(email);
 
   // 페이징 로직
   const totalItems = docList?.length || 0;
@@ -145,15 +144,15 @@ export default function DocumentListPage() {
 
               <div></div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">기안양식</label>
-                <Select value={documentType} onValueChange={setDocumentType}>
+                <label className="text-sm font-medium text-gray-700">유형</label>
+                <Select value={searchType} onValueChange={setSearchType}>
                   <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="전체">전체</SelectItem>
-                    <SelectItem value="업무협조">업무협조</SelectItem>
-                    <SelectItem value="업무기안">업무기안</SelectItem>
+                  {caList?.doc_CTGR?.map((item: string, idx: number) => (
+                      <SelectItem key={idx} value={item}>{item}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -161,18 +160,6 @@ export default function DocumentListPage() {
 
             <div className="grid grid-cols-4 gap-4">
               {/* Search Type */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">유형</label>
-                <Select value={searchType} onValueChange={setSearchType}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="강의">강의</SelectItem>
-                    <SelectItem value="크리넥스">크리넥스</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">검색어</label>
                 <Select value={searchType} onValueChange={setSearchType}>
@@ -230,8 +217,7 @@ export default function DocumentListPage() {
               <TableHeader>
                 <TableRow className="bg-gray-50">
                   <TableHead className="text-center font-medium">-</TableHead>
-                  <TableHead className="text-center font-medium">기안양식</TableHead>
-                  <TableHead className="text-center font-medium">기안학과</TableHead>
+                  <TableHead className="text-center font-medium">제목</TableHead>
                   <TableHead className="text-center font-medium">기안자</TableHead>
                   <TableHead className="text-center font-medium">유형</TableHead>
                   <TableHead className="text-center font-medium">상신일시</TableHead>
@@ -243,7 +229,6 @@ export default function DocumentListPage() {
                 {paginatedData?.map((doc: DocListItem) => (
                   <TableRow key={doc.doc_no} className="hover:bg-gray-50">
                     <TableCell className="text-center"><Checkbox id={doc.doc_no} /></TableCell>
-                    <TableCell className="text-center">{doc.user_dept}</TableCell>
                     <TableCell className="text-center">
                       <Link className="text-blue-600 hover:underline" href={`/document/${doc.doc_no}`}>{doc.doc_ttl}</Link>
                     </TableCell>

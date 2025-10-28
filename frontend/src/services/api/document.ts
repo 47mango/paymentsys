@@ -15,3 +15,8 @@ export const createDocument = async (document: any) => {
     const response = await axiosInstance.post('/api/draft', document);
     return response.data;
 }
+
+export const getCategory = async (body : any) => {
+    const response = await axiosInstance.post('/api/retrieve/category',body);
+    return response.data;
+}
