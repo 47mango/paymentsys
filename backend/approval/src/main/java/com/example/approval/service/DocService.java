@@ -26,6 +26,10 @@ public class DocService {
         String docNo = docMapper.createDocId(input.getCrt_date());
         if(docNo == null){
             docNo = crt_date + "0001";
+        }else{
+            long docNoTemp = Long.parseLong(docNo);
+            docNoTemp++;
+            docNo = String.valueOf(docNoTemp);
         }
         input.setDoc_no(docNo);
 
