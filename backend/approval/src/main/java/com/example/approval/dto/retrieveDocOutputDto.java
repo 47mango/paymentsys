@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class retrieveDocOutputDto {
-    private int doc_no;
+    private String doc_no;
     private String doc_ttl;
     private String doc_text;
     private List<docLineSubDto> doc_line;

@@ -17,6 +17,7 @@ public class createDocInputDto {
     private String doc_file;
     private List<docLineSubDto> doc_line;
 
+    private String doc_no;
     private String crt_date;
     private String doc_ctgr1;
     private String doc_ctgr2;

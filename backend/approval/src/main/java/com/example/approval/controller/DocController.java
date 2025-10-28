@@ -4,7 +4,6 @@ import com.example.approval.dto.*;
 import com.example.approval.service.CategoryService;
 import com.example.approval.service.DocService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,21 +31,19 @@ public class DocController {
         System.out.println("docLineSub Seq>>> " + input.getDoc_line().get(0).getSeq());
         System.out.println("docLineSub ApvrId>>> " + input.getDoc_line().get(0).getApvr_id());
 
+        //카테고리 생성
         createCategoryOutputDto bizOutput1 = categoryService.extractKeywords(input.getDoc_ttl());
-        System.out.println("categoryDto>>>"+bizOutput1);
 
+        //문서 저장
         input.setDoc_ctgr1(bizOutput1.getKeyword1());
         input.setDoc_ctgr2(bizOutput1.getKeyword2());
+        String bizOutput2 = docService.createDoc(input);
 
-        int bizOutput2 = docService.createDoc(input);
-        if(bizOutput2==1){
-            return ResponseEntity.ok("성공");
-        }else{
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("문서 저장 실패");
-        }
+        //결재선 생성
+        input.setDoc_no(bizOutput2);
+        docService.createLine(input);
 
+        return ResponseEntity.ok("성공 docNo: " + bizOutput2);
     }
 
     @PostMapping("/retrieve")
@@ -63,6 +60,14 @@ public class DocController {
         System.out.println("user_id>>> " + input.getDoc_no());
 
         retrieveDocOutputDto output = docService.retrieveDoc(input);
+
+        return ResponseEntity.ok(output);
+    }
+
+    @PostMapping("/retrieve/category")
+    public ResponseEntity<?> retrieveCategory(@RequestBody retrieveAllDocCategoryInputDto input){
+        System.out.println("input>>>"+input);
+        retrieveAllDocCategoryOutputDto output = docService.retrieveAllDocCategory(input);
 
         return ResponseEntity.ok(output);
     }
