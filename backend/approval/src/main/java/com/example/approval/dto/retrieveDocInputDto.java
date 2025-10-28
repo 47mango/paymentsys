@@ -9,5 +9,5 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class retrieveDocInputDto {
-    private int doc_no;
+    private String doc_no;
 }

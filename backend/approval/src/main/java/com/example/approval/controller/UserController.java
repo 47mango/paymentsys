@@ -41,4 +41,10 @@ public class UserController {
         return result;
     }
 
+    @GetMapping("/position")
+    public ResponseEntity<?> retrieveAllUserPosition(){
+        List<retrieveAllUserPositionOutputDto> result = userService.retrieveAllUserPosition();
+        return ResponseEntity.ok(result);
+    }
+
 }

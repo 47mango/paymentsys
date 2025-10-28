@@ -10,5 +10,5 @@ public interface UserMapper {
     List<retrieveAllUserOutputDto> retrieveAll();
     loginOutputDto login(loginInputDto input);
     int join(joinInputDto input);
-
+    List<retrieveAllUserPositionOutputDto> retrieveAllUserPosition();
 }

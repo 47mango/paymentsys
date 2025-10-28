@@ -3,10 +3,21 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.approval.dao.DocMapper">
+    <select id="createDocId" resultType="String">
+        SELECT MAX(DOC_NO)
+        FROM DOC_BASE
+        WHERE DOC_NO LIKE CONCAT(#{crt_date}, '%');
+    </select>
+
     <insert id="insertDoc">
         insert into
-        DOC_BASE(doc_ttl,doc_text,doc_act_yn,doc_user_id,crt_date,doc_ctgr1, doc_ctgr2)
-        values (#{doc_ttl},#{doc_text},"N",#{user_id},#{crt_date},#{doc_ctgr1},#{doc_ctgr2})
+        DOC_BASE(doc_no,doc_ttl,doc_text,doc_act_yn,doc_user_id,crt_date,doc_ctgr1,doc_ctgr2)
+        values (#{doc_no},#{doc_ttl},#{doc_text},"N",#{user_id},#{crt_date},#{doc_ctgr1},#{doc_ctgr2})
+    </insert>
+
+    <insert id="insertDocLine">
+        INSERT INTO DOC_LINE(DOC_NO, DOC_SEQ, USER_ID)
+        VALUES(#{doc_no},#{seq},#{apvr_id})
     </insert>
 
     <select id="selectAllDoc" resultType="com.example.approval.dto.retrieveAllOutputDto">
@@ -35,5 +46,24 @@
         from DOC_BASE a
         left join USER_BASE b on a.doc_user_id = b.user_id
         where doc_no = #{doc_no};
+    </select>
+
+    <select id="selectDocLine" resultType="com.example.approval.dto.docLineSubDto">
+        SELECT DOC_SEQ as seq
+             , USER_ID as apvr_id
+        FROM DOC_LINE
+        WHERE DOC_NO = #{doc_no}
+    </select>
+
+    <select id="selectAllDocCategory" resultType="String">
+        SELECT DOC_CTGR1 AS DOC_CTGR
+        FROM DOC_BASE
+        WHERE DOC_USER_ID = #{user_id}
+        AND DOC_CTGR1 IS NOT NULL
+        UNION
+        SELECT DOC_CTGR2 AS DOC_CTGR
+        FROM DOC_BASE
+        WHERE DOC_USER_ID = #{user_id}
+        AND DOC_CTGR2 IS NOT NULL
     </select>
 </mapper>

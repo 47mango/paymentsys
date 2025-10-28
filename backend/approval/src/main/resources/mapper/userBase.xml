@@ -22,5 +22,12 @@
         INSERT INTO USER_BASE(USER_ID,USER_NAME,CRT_DATE)
         VALUES(#{user_id},#{user_name},#{crt_date});
     </insert>
+
+    <select id="retrieveAllUserPosition" resultType="String">
+        SELECT USER_POSITION AS user_position
+             , USER_POSITION_ENG AS user_position_eng
+        FROM USER_POSITION
+        ORDER BY POSITION_SEQ;
+    </select>
     
 </mapper>

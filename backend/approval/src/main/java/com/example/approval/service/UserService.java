@@ -50,4 +50,10 @@ public class UserService {
 
         return result;
     }
+
+    public List<retrieveAllUserPositionOutputDto> retrieveAllUserPosition(){
+        List<retrieveAllUserPositionOutputDto> result = userMapper.retrieveAllUserPosition();
+        System.out.println("result>>>"+result);
+        return result;
+    }
 }
