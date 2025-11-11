@@ -16,6 +16,8 @@ public class retrieveDocOutputDto {
     private String doc_text;
     private List<docLineSubDto> doc_line;
     private String doc_user_id;
+    private String doc_ctgr1;
+    private String doc_ctgr2;
     private String user_dept;
     private String crt_date;
 }
