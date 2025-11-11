@@ -24,13 +24,16 @@ export default function DocumentListPage() {
   const [endDate, setEndDate] = useState<Date>()
   const [documentType, setDocumentType] = useState("전체")
   const [approvalStatus, setApprovalStatus] = useState("전체")
-  const [searchType, setSearchType] = useState("기안제목")
+  const [searchType, setSearchType] = useState("제목")
   const [searchQuery, setSearchQuery] = useState("")
   const [pageSize, setPageSize] = useState("10")
   const [currentPage, setCurrentPage] = useState(1)
   const router = useRouter()
   
   const applyUser = useUser();
+
+  const today = new Date();
+  console.log(today)
 
   const { data: session } = useSession();
 
@@ -51,18 +54,52 @@ export default function DocumentListPage() {
   const { data : docList } = useDocList(email);
   const { data : caList } = useCarList(email);
 
+  // 조회 버튼으로 적용되는 필터 상태 (기안일 제외)
+  const [appliedDocumentType, setAppliedDocumentType] = useState<string>("전체")
+  const [appliedSearchType, setAppliedSearchType] = useState<string>("제목")
+  const [appliedSearchQuery, setAppliedSearchQuery] = useState<string>("")
+
+  // 조회 버튼 클릭 시 필터 적용
+  const applyFilters = () => {
+    setAppliedDocumentType(documentType)
+    setAppliedSearchType(searchType)
+    setAppliedSearchQuery(searchQuery.trim())
+    setCurrentPage(1)
+  }
+
+  // 필터링된 리스트 (기안일 제외)
+  const filteredList = useMemo(() => {
+    const source = docList ?? []
+    return source.filter((doc) => {
+      // 유형 필터 (doc_ctgr1 또는 doc_ctgr2에 일치)
+      const matchType =
+        appliedDocumentType === "전체" ||
+        doc.doc_ctgr1 === appliedDocumentType ||
+        doc.doc_ctgr2 === appliedDocumentType
+
+      // 검색어 필터
+      const query = appliedSearchQuery
+      const matchQuery =
+        query === "" ||
+        (appliedSearchType === "제목" && (doc.doc_ttl ?? "").toLowerCase().includes(query.toLowerCase())) ||
+        (appliedSearchType === "기안자" && (doc.doc_user_id ?? "").toLowerCase().includes(query.toLowerCase()))
+
+      return matchType && matchQuery
+    })
+  }, [docList, appliedDocumentType, appliedSearchType, appliedSearchQuery])
+
   // 페이징 로직
-  const totalItems = docList?.length || 0;
+  const totalItems = filteredList.length || 0;
   const itemsPerPage = parseInt(pageSize);
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   
   // 현재 페이지에 표시할 데이터 계산
   const paginatedData = useMemo(() => {
-    if (!docList) return [];
+    if (!filteredList) return [];
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    return docList.slice(startIndex, endIndex);
-  }, [docList, currentPage, itemsPerPage]);
+    return filteredList.slice(startIndex, endIndex);
+  }, [filteredList, currentPage, itemsPerPage]);
 
   // 페이지 사이즈 변경 시 첫 페이지로 이동
   const handlePageSizeChange = (newPageSize: string) => {
@@ -101,7 +138,7 @@ export default function DocumentListPage() {
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-bold text-gray-900">결재 현황</h1>
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <span>2021.10.14 14:08:16 기준</span>
+            <span>{typeof today === 'string' ? today : today instanceof Date ? today.toLocaleDateString() : ''}</span>
             <Button variant="ghost" size="sm" className="p-1">
               <RefreshCw className="h-4 w-4" />
             </Button>
@@ -114,7 +151,7 @@ export default function DocumentListPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
               {/* Date Range */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">상신일</label>
+                <label className="text-sm font-medium text-gray-700">기안일</label>
                 <div className="flex items-center gap-2">
                   <Popover>
                     <PopoverTrigger asChild>
@@ -145,11 +182,12 @@ export default function DocumentListPage() {
               <div></div>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">유형</label>
-                <Select value={searchType} onValueChange={setSearchType}>
+                <Select value={documentType} onValueChange={setDocumentType}>
                   <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
+                  <SelectItem value="전체">전체</SelectItem>
                   {caList?.doc_CTGR?.map((item: string, idx: number) => (
                       <SelectItem key={idx} value={item}>{item}</SelectItem>
                     ))}
@@ -167,7 +205,7 @@ export default function DocumentListPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="기안제목">기안제목</SelectItem>
+                    <SelectItem value="제목">제목</SelectItem>
                     <SelectItem value="기안자">기안자</SelectItem>
                   </SelectContent>
                 </Select>
@@ -181,7 +219,7 @@ export default function DocumentListPage() {
 
               {/* Search Button */}
               <div className="flex items-end justify-around">
-                <Button className=" bg-gray-700 hover:bg-gray-800">조회</Button>
+                <Button className=" bg-gray-700 hover:bg-gray-800" onClick={applyFilters}>조회</Button>
                 <Button className=" bg-gray-700 hover:bg-gray-800" onClick={() => router.push("/document/form")}>기안하기</Button>
               </div>
             </div>
@@ -194,7 +232,7 @@ export default function DocumentListPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600">총</span>
-                <span className="text-sm font-medium">{docList?.length}건</span>
+                <span className="text-sm font-medium">{filteredList.length}건</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600">페이지 사이즈</span>
