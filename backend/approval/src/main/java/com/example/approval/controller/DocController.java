@@ -71,4 +71,12 @@ public class DocController {
 
         return ResponseEntity.ok(output);
     }
+
+    @PostMapping("/update/doc")
+    public ResponseEntity<?> updateDoc(@RequestBody updateDocInput input){
+        System.out.println("input>>>"+input);
+        docService.updateDoc(input);
+
+        return ResponseEntity.ok("");
+    }
 }

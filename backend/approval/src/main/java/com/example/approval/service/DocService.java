@@ -76,4 +76,8 @@ public class DocService {
         retrieveAllDocCategoryOutputDto output = new retrieveAllDocCategoryOutputDto(bizOutput);
         return output;
     }
+
+    public void updateDoc(updateDocInput input){
+        docMapper.updateDoc(input);
+    }
 }
