@@ -44,7 +44,7 @@ export default function DocumentDetailPage() {
       setSecondaryCategory(docDetail.doc_ctgr2 ?? "");
     }
   }, [docDetail]);
-  
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 p-6 w-full">
@@ -129,7 +129,7 @@ export default function DocumentDetailPage() {
             <Label htmlFor="content">문서요약본</Label>
             <Textarea
               id="content"
-              value={"" || "문서 내용이 여기에 표시됩니다.\n\n이 문서는 업무 관련 내용을 담고 있으며, 적절한 절차를 거쳐 승인을 받아야 합니다."}
+              value={docDetail.doc_summary || "문서 내용이 여기에 표시됩니다.\n\n이 문서는 업무 관련 내용을 담고 있으며, 적절한 절차를 거쳐 승인을 받아야 합니다."}
               readOnly
               className="h-70 bg-gray-50"
             />
