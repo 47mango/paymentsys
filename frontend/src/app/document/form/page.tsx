@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PlusCircle, Trash2, Upload, User } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "next-auth/react";
 import { useFormDocument } from "@/hooks/document";
@@ -22,6 +22,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { useUserList } from "@/hooks/user";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 // 결재자 타입 정의
 interface Approver {
@@ -46,6 +47,18 @@ export default function DocumentDraftForm() {
   // React Query mutation 훅은 컴포넌트 최상위에서 선언해야 합니다.
   const createDocMutation = useFormDocument();
   const {data : userList} = useUserList();
+
+  const groupedUsers = useMemo(() => {
+    const groups: Record<string, any[]> = {};
+  
+    userList?.forEach((user: any) => {
+      const dept = user.user_dept || "기타";
+      if (!groups[dept]) groups[dept] = [];
+      groups[dept].push(user);
+    });
+  
+    return groups;
+  }, [userList]);
 
   // 세션에서 사용자 정보를 가져와서 drafter state에 설정
   useEffect(() => {
@@ -260,47 +273,76 @@ export default function DocumentDraftForm() {
                       </Button>
                     </DialogTrigger>
                     <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>결제자 추가</DialogTitle>
-                        <DialogDescription>
-                          <Card className="mt-4">
-                            <CardContent>
-                              <Table>
-                                <TableHeader>
-                                  <TableHead className="text-center font-medium">-</TableHead>
-                                  <TableHead className="text-center font-medium">이름</TableHead>
-                                  <TableHead className="text-center font-medium">소속과</TableHead>
-                                  <TableHead className="text-center font-medium">소속</TableHead>
-                                </TableHeader>
-                                <TableBody>
-                                  {userList?.map((item:any,idx : any) => (
-                                    <TableRow key={item.user_id} className="hover:bg-gray-50">
-                                    <TableCell className="text-center">
-                                      <Checkbox 
-                                        id={item.user_id}
-                                        checked={selectedUsers.includes(item.user_id)}
-                                        onCheckedChange={() => toggleUserSelection(item.user_id)}
-                                      />
-                                    </TableCell>
-                                    <TableCell className="text-center text-sm">{item.user_name}</TableCell>
-                                    <TableCell className="text-center text-sm">컴퓨터공학부</TableCell>
-                                    <TableCell className="text-center text-sm">동양미래대학교</TableCell>
-                                  </TableRow>
-                                  ))}
-                                </TableBody>
-                              </Table>
-                            </CardContent>
-                            <CardFooter className="gap-4 self-end">
-                              <DialogClose asChild>
-                                <Button variant="outline">취소</Button>
-                              </DialogClose>
-                              <DialogClose asChild>
-                                <Button onClick={addSelectedUsersToApprovers}>확인</Button>
-                              </DialogClose>
-                            </CardFooter>
-                          </Card>
-                        </DialogDescription>
-                      </DialogHeader>
+                    <DialogHeader>
+                      <DialogTitle>결제자 추가</DialogTitle>
+                      <DialogDescription>
+                        <Card className="mt-4">
+                          <CardContent>
+                            <Accordion type="multiple" className="w-full">
+                              {Object.entries(groupedUsers).map(([dept, users]) => (
+                                <AccordionItem key={dept} value={dept}>
+                                  <AccordionTrigger>
+                                    <div className="flex w-full items-center justify-between">
+                                      <span>{dept}</span>
+                                      <span className="text-xs text-gray-500">
+                                        {users.length}명
+                                      </span>
+                                    </div>
+                                  </AccordionTrigger>
+
+                                  <AccordionContent>
+                                    <Table>
+                                      <TableHeader>
+                                        <TableHead className="text-center font-medium">-</TableHead>
+                                        <TableHead className="text-center font-medium">이름</TableHead>
+                                        <TableHead className="text-center font-medium">소속과</TableHead>
+                                        <TableHead className="text-center font-medium">소속</TableHead>
+                                      </TableHeader>
+                                      <TableBody>
+                                        {users.map((item) => (
+                                          <TableRow
+                                            key={item.user_id}
+                                            className="hover:bg-gray-50"
+                                          >
+                                            <TableCell className="text-center">
+                                              <Checkbox
+                                                id={item.user_id}
+                                                checked={selectedUsers.includes(item.user_id)}
+                                                onCheckedChange={() =>
+                                                  toggleUserSelection(item.user_id)
+                                                }
+                                              />
+                                            </TableCell>
+                                            <TableCell className="text-center text-sm">
+                                              {item.user_name}
+                                            </TableCell>
+                                            <TableCell className="text-center text-sm">
+                                              {item.user_dept}
+                                            </TableCell>
+                                            <TableCell className="text-center text-sm">
+                                              동양미래대학교
+                                            </TableCell>
+                                          </TableRow>
+                                        ))}
+                                      </TableBody>
+                                    </Table>
+                                  </AccordionContent>
+                                </AccordionItem>
+                              ))}
+                            </Accordion>
+                          </CardContent>
+
+                          <CardFooter className="gap-4 self-end">
+                            <DialogClose asChild>
+                              <Button variant="outline">취소</Button>
+                            </DialogClose>
+                            <DialogClose asChild>
+                              <Button onClick={addSelectedUsersToApprovers}>확인</Button>
+                            </DialogClose>
+                          </CardFooter>
+                        </Card>
+                      </DialogDescription>
+                    </DialogHeader>
                     </DialogContent>
                   </Dialog>
             </div>

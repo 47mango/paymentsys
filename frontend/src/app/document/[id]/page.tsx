@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -33,8 +35,16 @@ export default function DocumentDetailPage() {
   const { data: docDetail, isLoading, isError } =
     id !== undefined ? useDetailDoc(Number(id)) : { data: undefined, isLoading: false, isError: false } as any;
 
-    console.log(docDetail)
+  const [primaryCategory, setPrimaryCategory] = useState("");
+  const [secondaryCategory, setSecondaryCategory] = useState("");
 
+  useEffect(() => {
+    if (docDetail) {
+      setPrimaryCategory(docDetail.doc_ctgr1 ?? "");
+      setSecondaryCategory(docDetail.doc_ctgr2 ?? "");
+    }
+  }, [docDetail]);
+  
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 p-6 w-full">
@@ -114,6 +124,17 @@ export default function DocumentDetailPage() {
             />
           </div>
 
+          {/* 문서요약 */}
+          <div className="space-y-2">
+            <Label htmlFor="content">문서요약본</Label>
+            <Textarea
+              id="content"
+              value={"" || "문서 내용이 여기에 표시됩니다.\n\n이 문서는 업무 관련 내용을 담고 있으며, 적절한 절차를 거쳐 승인을 받아야 합니다."}
+              readOnly
+              className="h-70 bg-gray-50"
+            />
+          </div>
+
           {/* 기안자 */}
           <div className="space-y-2">
             <Label htmlFor="drafter">기안자</Label>
@@ -134,6 +155,25 @@ export default function DocumentDetailPage() {
               readOnly
               className="bg-gray-50"
             /> 
+          </div>
+
+          {/* 카테고리 */}
+          <div className="space-y-2">
+            <Label htmlFor="department">카테고리</Label>
+            <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+              <Input
+                id="category-primary"
+                value={primaryCategory}
+                onChange={(e) => setPrimaryCategory(e.target.value)}
+                placeholder="주요 카테고리"
+              />
+              <Input
+                id="category-secondary"
+                value={secondaryCategory}
+                onChange={(e) => setSecondaryCategory(e.target.value)}
+                placeholder="세부 카테고리"
+              />
+            </div>
           </div>
 
           {/* 상신일 */}
@@ -272,6 +312,8 @@ export default function DocumentDetailPage() {
               </div>
             </div>
           )}
+
+          <Button>수정하기</Button>
         </CardContent>
       </Card>
     </div>

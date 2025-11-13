@@ -20,3 +20,8 @@ export const getCategory = async (body : any) => {
     const response = await axiosInstance.post('/api/retrieve/category',body);
     return response.data;
 }
+
+export const postCategroy = async (body : any) => {
+    const response = await axiosInstance.post('/api/update/doc',body);
+    return response.data;
+}

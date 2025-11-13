@@ -1,4 +1,20 @@
+"use client"
+
+import { useDocList } from "@/hooks/document";
+import { useSession } from "next-auth/react";
+
 export default function HomePage() {
+
+  const { data: session } = useSession();
+
+  const userInfo = session?.user;
+
+  const email = userInfo?.email ?? "";
+
+  const { data: docList } = useDocList(email);
+
+  const documentLe = docList?.length;
+
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
@@ -9,7 +25,7 @@ export default function HomePage() {
           <div className="flex flex-row items-center justify-between space-y-0 pb-2">
             <h3 className="tracking-tight text-sm font-medium">총 프로젝트</h3>
           </div>
-          <div className="text-2xl font-bold">12</div>
+          <div className="text-2xl font-bold">{documentLe}</div>
           <p className="text-xs text-muted-foreground">지난 달 대비 +20.1%</p>
         </div>
         <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
