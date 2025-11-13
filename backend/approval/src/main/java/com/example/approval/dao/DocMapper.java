@@ -14,4 +14,5 @@ public interface DocMapper {
     retrieveDocOutputDto selectDoc(retrieveDocInputDto input);
     List<docLineSubDto> selectDocLine(retrieveDocInputDto input);
     List<String> selectAllDocCategory(retrieveAllDocCategoryInputDto input);
+    void updateDoc(updateDocInput input);
 }

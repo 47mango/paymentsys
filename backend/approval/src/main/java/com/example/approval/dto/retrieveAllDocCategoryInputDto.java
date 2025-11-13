@@ -9,5 +9,5 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class retrieveAllDocCategoryInputDto {
-    String user_id;
+    private String user_id;
 }

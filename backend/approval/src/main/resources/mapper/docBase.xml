@@ -66,4 +66,11 @@
         WHERE DOC_USER_ID = #{user_id}
         AND DOC_CTGR2 IS NOT NULL
     </select>
+
+    <update id="updateDoc">
+        UPDATE DOC_BASE
+        SET DOC_CTGR1 = #{doc_ctgr1}
+        , DOC_CTGR2 = #{doc_ctgr2}
+        WHERE DOC_NO = #{doc_no};
+    </update>
 </mapper>

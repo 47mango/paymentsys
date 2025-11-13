@@ -8,8 +8,8 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class retrieveAllUserOutputDto {
-    private String user_id;
-    private String user_name;
-    private String user_dept;
+public class updateDocInput {
+    private String doc_no;
+    private String doc_ctgr1;
+    private String doc_ctgr2;
 }

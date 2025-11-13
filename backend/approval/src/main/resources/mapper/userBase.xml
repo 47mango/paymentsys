@@ -5,6 +5,7 @@
     <select id="retrieveAll" resultType="com.example.approval.dto.retrieveAllUserOutputDto">
         SELECT USER_ID as user_id
                 , USER_NAME as user_name
+                , USER_DEPT as user_dept
         FROM USER_BASE;
     </select>
 
