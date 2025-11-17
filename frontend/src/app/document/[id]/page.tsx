@@ -45,8 +45,6 @@ export default function DocumentDetailPage() {
     }
   }, [docDetail]);
 
-  console.log("docDetail", docDetail);
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 p-6 w-full">
@@ -229,14 +227,12 @@ export default function DocumentDetailPage() {
           <div className="space-y-2">
             <Label htmlFor="file">첨부파일</Label>
             <div className="space-y-2">
-              {docDetail.attached_files && docDetail.attached_files.length > 0 ? (
-                docDetail.attached_files.map((file: any, index: number) => (
-                  <div key={index} className="flex items-center justify-between p-3 border rounded-md">
+              {docDetail.doc_file ? (
+                  <div className="flex items-center justify-between p-3 border rounded-md">
                     <div className="flex items-center gap-3">
                       <FileText size={20} className="text-gray-500" />
                       <div>
-                        <div className="text-sm font-medium">{file.name}</div>
-                        <div className="text-xs text-gray-500">{file.size}</div>
+                        <div className="text-sm font-medium">{docDetail.doc_file}</div>
                       </div>
                     </div>
                     <Button variant="outline" size="sm" className="flex items-center gap-2">
@@ -244,7 +240,6 @@ export default function DocumentDetailPage() {
                       다운로드
                     </Button>
                   </div>
-                ))
               ) : (
                 <div className="text-center py-4 text-sm text-gray-500 border border-dashed rounded-md">
                   첨부파일이 없습니다.
