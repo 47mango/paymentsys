@@ -45,6 +45,8 @@ export default function DocumentDetailPage() {
     }
   }, [docDetail]);
 
+  console.log("docDetail", docDetail);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 p-6 w-full">
@@ -254,9 +256,9 @@ export default function DocumentDetailPage() {
           {/* 결재선 */}
           <div className="space-y-4">
             <Label>결재선</Label>
-            {docDetail.approval_line && docDetail.approval_line.length > 0 ? (
+            {docDetail.doc_line && docDetail.doc_line.length > 0 ? (
               <div className="space-y-3">
-                {docDetail.approval_line.map((approver: any, index: number) => (
+                {docDetail.doc_line.map((approver: any, index: number) => (
                   <div
                     key={index}
                     className="flex items-center gap-2 p-3 border rounded-md"
@@ -268,7 +270,7 @@ export default function DocumentDetailPage() {
                       <div className="flex items-center gap-2">
                         <User size={16} className="text-gray-500" />
                         <Input
-                          value={approver.name || `결재자 ${index + 1}`}
+                          value={approver.apvr_id || `결재자 ${index + 1}`}
                           readOnly
                           className="bg-gray-50"
                         />
