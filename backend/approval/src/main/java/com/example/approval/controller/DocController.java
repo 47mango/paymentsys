@@ -28,8 +28,6 @@ public class DocController {
         System.out.println("docTitle>>> " + input.getDoc_ttl());
         System.out.println("docText>>> " + input.getDoc_text());
         System.out.println("docLine>>> " + input.getDoc_line());
-        System.out.println("docLineSub Seq>>> " + input.getDoc_line().get(0).getSeq());
-        System.out.println("docLineSub ApvrId>>> " + input.getDoc_line().get(0).getApvr_id());
 
         //카테고리 생성
         createCategoryOutputDto bizOutput1 = categoryService.extractKeywords(input.getDoc_ttl());
