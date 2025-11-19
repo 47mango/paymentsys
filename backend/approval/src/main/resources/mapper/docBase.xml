@@ -22,7 +22,7 @@
 
     <select id="selectAllDoc" resultType="com.example.approval.dto.retrieveAllOutputDto">
         select a.doc_no
-             , a.doc_user_id
+             , b.user_name as doc_user_id
              , a.doc_ttl
              , b.user_dept
              , a.crt_date
