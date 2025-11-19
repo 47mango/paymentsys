@@ -41,9 +41,9 @@ export const useCarList = (user_id : string) => {
   })
 }
 
-export const usePostCar = (body : any) => {
+export const usePostCar = () => {
   return useMutation({
     mutationKey: ['postcate'],
-    mutationFn: () => postCategroy(body)
+    mutationFn: (body: any) => postCategroy(body)
   })
 }

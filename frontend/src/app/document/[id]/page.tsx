@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useDetailDoc } from "@/hooks/document";
+import { useDetailDoc, usePostCar } from "@/hooks/document";
 import { formatYmd } from "@/lib/utils";
 import { useParams, useRouter } from "next/navigation";
 import { 
@@ -30,6 +30,7 @@ import {
 export default function DocumentDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const patchDocCategory = usePostCar();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
   const { data: docDetail, isLoading, isError } =
@@ -45,6 +46,24 @@ export default function DocumentDetailPage() {
     }
   }, [docDetail]);
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const formData = {
+      doc_no : id,
+      doc_ctgr1 : primaryCategory,
+      doc_ctgr2 : secondaryCategory,
+    };
+
+    try {
+      await patchDocCategory.mutateAsync(formData);
+      alert("카테고리가 수정되었습니다.");
+      router.push("/document");
+    } catch (error) {
+      console.error("카테고리 수정 실패:", error);
+      alert("카테고리 수정에 실패했습니다.");
+    }
+  };
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 p-6 w-full">
@@ -85,6 +104,7 @@ export default function DocumentDetailPage() {
   };
 
   return (
+    <form onSubmit={handleSubmit}>
     <div className="min-h-screen bg-gray-50 p-6 w-full">
       <Card className="max-w-7xl mx-auto">
         <CardHeader>
@@ -314,5 +334,6 @@ export default function DocumentDetailPage() {
         </CardContent>
       </Card>
     </div>
+    </form>
   );
 }
