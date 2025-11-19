@@ -21,4 +21,5 @@ public class retrieveDocOutputDto {
     private String user_dept;
     private String crt_date;
     private String doc_file;
+    private String doc_summary;
 }
