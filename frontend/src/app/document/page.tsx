@@ -189,7 +189,7 @@ export default function DocumentListPage() {
                   <SelectContent>
                   <SelectItem value="전체">전체</SelectItem>
                   {caList?.doc_CTGR?.map((item: string, idx: number) => (
-                      <SelectItem key={idx} value={item}>{item}</SelectItem>
+                      <SelectItem key={idx} value={item ?? ""}>{item ?? ""}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
