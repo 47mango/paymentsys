@@ -188,9 +188,14 @@ export default function DocumentListPage() {
                   </SelectTrigger>
                   <SelectContent>
                   <SelectItem value="전체">전체</SelectItem>
-                  {caList?.doc_CTGR?.map((item: string, idx: number) => (
-                      <SelectItem key={idx} value={item ?? ""}>{item ?? ""}</SelectItem>
-                    ))}
+                  {caList?.doc_CTGR?.map((item: string, idx: number) => {
+                    if (!item) return null; // 빈 문자열이면 렌더하지 않음
+                    return (
+                      <SelectItem key={idx} value={item}>
+                        {item}
+                      </SelectItem>
+                    );
+                  })}
                   </SelectContent>
                 </Select>
               </div>
