@@ -44,6 +44,7 @@
         , a.doc_ctgr1
         , a.doc_ctgr2
         , a.doc_file
+        , a.doc_summary
         from DOC_BASE a
         left join USER_BASE b on a.doc_user_id = b.user_id
         where doc_no = #{doc_no};
