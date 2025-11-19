@@ -11,8 +11,8 @@
 
     <insert id="insertDoc">
         insert into
-        DOC_BASE(doc_no,doc_ttl,doc_text,doc_act_yn,doc_user_id,crt_date,doc_ctgr1,doc_ctgr2)
-        values (#{doc_no},#{doc_ttl},#{doc_text},"N",#{user_id},#{crt_date},#{doc_ctgr1},#{doc_ctgr2})
+        DOC_BASE(doc_no,doc_ttl,doc_text,doc_act_yn,doc_user_id,crt_date,doc_ctgr1,doc_ctgr2,doc_file)
+        values (#{doc_no},#{doc_ttl},#{doc_text},"N",#{user_id},#{crt_date},#{doc_ctgr1},#{doc_ctgr2},#{doc_file})
     </insert>
 
     <insert id="insertDocLine">
@@ -43,6 +43,7 @@
         , b.user_dept
         , a.doc_ctgr1
         , a.doc_ctgr2
+        , a.doc_file
         from DOC_BASE a
         left join USER_BASE b on a.doc_user_id = b.user_id
         where doc_no = #{doc_no};
